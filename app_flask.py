@@ -8,6 +8,9 @@ import os
 app = Flask(__name__)
 CORS(app)
 
+# Configure for production
+app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB max file size
+
 # Load the fixed model (pipeline that includes vectorizer)
 try:
     model = joblib.load("fake_news_model_fixed.pkl")
@@ -142,16 +145,11 @@ def not_found(error):
 def internal_error(error):
     return jsonify({'error': 'Internal server error'}), 500
 
-if __name__ == '__main__':
-    # Check if model files exist
-    if not os.path.exists("fake_news_model.pkl"):
-        print("❌ Model file 'fake_news_model.pkl' not found!")
+if __name__ == "__main__":
+    # Check if model file exists
+    if not os.path.exists("fake_news_model_fixed.pkl"):
+        print("❌ Model file 'fake_news_model_fixed.pkl' not found!")
         print("Please ensure the model file is in the same directory as app_flask.py")
-        exit(1)
-    
-    if not os.path.exists("vectorizer.pkl"):
-        print("❌ Vectorizer file 'vectorizer.pkl' not found!")
-        print("Please ensure the vectorizer file is in the same directory as app_flask.py")
         exit(1)
     
     print("🚀 Starting Truth Lens Flask Server...")
@@ -159,7 +157,6 @@ if __name__ == '__main__':
     print("🔧 API Endpoints:")
     print("   GET  /           - Main application")
     print("   POST /predict    - Analyze text")
-    print("   GET  /history    - Get prediction history")
     print("   GET  /stats      - Get statistics")
     print("   GET  /health     - Health check")
     

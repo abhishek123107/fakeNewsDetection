@@ -1,0 +1,31 @@
+# Virtual environments
+venv/
+env/
+.venv/
+*.pyc
+__pycache__/
+*.pyo
+*.pyd
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE files
+.vscode/
+.idea/
+
+# Large datasets
+*.csv
+*.json
+*.xlsx
+
+# Model files (keep small ones)
+# fake_news_model_fixed.pkl # Keep this one
+
+# Logs
+*.log
+
+# Cache
+.cache/
+.pytest_cache/
