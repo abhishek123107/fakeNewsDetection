@@ -4,17 +4,19 @@ import joblib
 import numpy as np
 from datetime import datetime
 import os
+from config import Config
 
 app = Flask(__name__)
-CORS(app)
 
-# Configure for production
-app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB max file size
+# Initialize configuration
+Config.init_app(app)
+CORS(app, origins=app.config['CORS_ORIGINS'])
 
 # Load the fixed model (pipeline that includes vectorizer)
 try:
-    model = joblib.load("fake_news_model_fixed.pkl")
-    print("✅ Fixed model loaded successfully")
+    model_path = app.config['MODEL_PATH']
+    model = joblib.load(model_path)
+    print(f"✅ Model loaded successfully from {model_path}")
 except Exception as e:
     print(f"❌ Error loading model: {e}")
     model = None
@@ -147,17 +149,24 @@ def internal_error(error):
 
 if __name__ == "__main__":
     # Check if model file exists
-    if not os.path.exists("fake_news_model_fixed.pkl"):
-        print("❌ Model file 'fake_news_model_fixed.pkl' not found!")
-        print("Please ensure the model file is in the same directory as app_flask.py")
+    model_path = app.config['MODEL_PATH']
+    if not os.path.exists(model_path):
+        print(f"❌ Model file '{model_path}' not found!")
+        print("Please ensure model file is in the correct location")
         exit(1)
     
     print("🚀 Starting Truth Lens Flask Server...")
-    print("📱 Open your browser and go to: http://localhost:5000")
+    print(f"📱 Environment: {app.config['FLASK_ENV']}")
+    print(f"🌐 Host: {app.config['HOST']}:{app.config['PORT']}")
     print("🔧 API Endpoints:")
     print("   GET  /           - Main application")
     print("   POST /predict    - Analyze text")
+    print("   GET  /history    - Get prediction history")
     print("   GET  /stats      - Get statistics")
     print("   GET  /health     - Health check")
     
-    app.run(debug=True, host='0.0.0.0', port=5000)
+    app.run(
+        debug=app.config['DEBUG'], 
+        host=app.config['HOST'], 
+        port=app.config['PORT']
+    )
